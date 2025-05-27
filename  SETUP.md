@@ -1,39 +1,33 @@
-# 🪄 Claude Setup Guide for Documentation and Automation
+# 🪄 Claude Setup Guide
 
-## 🎯 Overview
+## 🧭 Purpose
 
-This guide serves as a comprehensive setup document to assist Claude Code in generating key documentation and configuration files for this project. It includes:
-
-* `CLAUDE.md`: Claude-specific behavioral guide
-* `README.md`: Project overview
-* `TESTING.md`: Testing guidelines
-* `STRUCTURE.md`: Project structure explanation
-* `CONTRIBUTING.md`: Contribution guidelines
-* `.github/workflows/claude.yml`: GitHub Actions workflow configuration
-
-Claude is expected not only to interpret the provided structure and intent but also to actively think, hypothesize, test, gather feedback, and iteratively improve the generated outputs to achieve optimal results.
+This guide outlines the recommended setup process for projects using Claude Code. It ensures consistent project initialization, documentation generation, task automation, and best practices in version control and security. Claude is expected to act autonomously—reasoning, testing, and improving iteratively to deliver reliable results.
 
 ---
 
-## 📄 Specification Input (for Claude)
+## 📘 Specification Reference
 
-Please paste your project specification here:
+Claude must consult the following specification file before generating any content:
 
 ```
-Example contents:
-- Project goals
-- Functional requirements
-- User types and use cases
-- Technology stack
-- Page or module structure
-- Testing requirements
+docs/specification.md
 ```
+
+This document includes:
+
+* Project goals
+* Functional specifications
+* User roles and scenarios
+* Technology stack
+* Page/module hierarchy
+* Test expectations
 
 ---
 
-## 📁 Project Directory Structure Template
+## 🗂️ Recommended Directory Structure
 
-Please generate the following directory and file structure:
+Use the following directory layout as the base for the project:
 
 ```
 my-project/
@@ -56,7 +50,8 @@ my-project/
 │   ├── README.md
 │   ├── TESTING.md
 │   ├── STRUCTURE.md
-│   └── CONTRIBUTING.md
+│   ├── CONTRIBUTING.md
+│   └── specification.md
 ├── scripts/
 │   ├── setup.sh
 │   ├── test.sh
@@ -74,25 +69,25 @@ my-project/
 
 ---
 
-## 🤖 Claude + GitHub Actions Integration
+## 🔁 GitHub Actions Integration
 
-Claude Code is integrated with GitHub Actions to enable the following automations:
+Claude works with GitHub Actions to automate:
 
-* Responding to issues and pull requests via `@claude` comments
-* Performing automated code reviews, bug fixes, and feature generation
-* Following project guidelines defined in `CLAUDE.md`
+* Code review and generation
+* Responding to issue and PR comments
+* Following documentation and security guidelines
 
-### 🔧 Setup Instructions
+### ⚙️ Setup Instructions
 
-1. Launch Claude and run the following command:
+1. Install Claude GitHub App via:
 
 ```bash
 /install-github-app
 ```
 
-2. Add `ANTHROPIC_API_KEY` to GitHub repository secrets
+2. Add `ANTHROPIC_API_KEY` to GitHub Secrets.
 
-3. Create the following GitHub Actions workflow file:
+3. Create `.github/workflows/claude.yml`:
 
 ```yaml
 name: Claude Assistant
@@ -119,69 +114,95 @@ jobs:
 
 ---
 
+## 🔀 Issue & Branch Management
+
+To enable concurrent development, Claude should follow these best practices:
+
+* For every issue, create a uniquely named branch: `feature/issue-###-slug`
+* Work on multiple branches independently and avoid conflicting files
+* Each commit should reference its related issue: e.g. `feat: resolves #42`
+* Use draft PRs to validate workflows early
+* Claude must detect and intelligently resolve merge conflicts
+
+### 🔄 Example Workflow
+
+1. Claude is tagged in issues #101 and #102
+2. It creates `feature/issue-101-auth-module` and `feature/issue-102-form-validation`
+3. It pushes commits and opens PRs for each branch
+4. Each PR is tested, reviewed, and merged independently
+
+---
+
 ## 🔐 Security Best Practices
 
-Follow these practices to ensure safe operation of Claude Code and GitHub Actions:
+Claude must operate within safe boundaries:
 
-### ✅ Secrets Management
+### 🔑 Secrets
 
-* Store `ANTHROPIC_API_KEY` and other secrets in GitHub Secrets.
-* Do not expose secrets in logs or source files.
-* Confirm generated outputs do not leak sensitive data.
+* Use GitHub Secrets (e.g., `ANTHROPIC_API_KEY`)
+* Never print secrets in logs
 
-### ✅ Scope Limitation
+### 📏 Scope Restriction
 
-* Limit Claude's operations to specific directories or pull requests.
-* Define allowed tools and scopes in the workflow config.
+* Limit Claude’s permissions to what is necessary
+* Constrain automated changes to defined directories
 
-### ✅ Output Review
+### 👀 Output Validation
 
-* Always manually review Claude's output before merging.
-* Confirm functionality via tests before accepting changes.
+* Human reviewers must check all Claude outputs
+* Automated and manual tests are mandatory
 
-### ✅ Minimal Permissions
+### 🛡️ Least Privilege
 
-* Grant Claude GitHub App the minimum required permissions.
-* Restrict trigger comments in public repositories.
+* Minimize GitHub App permissions
+* Avoid enabling Claude for public PRs unless protected
 
-### ✅ Troubleshooting
+### 🧰 Troubleshooting Tips
 
-* If you encounter a `gh: Not Found` error, update GitHub CLI credentials:
+If authentication fails:
 
 ```bash
 gh auth refresh -h github.com -s workflow
 ```
 
-* If `Raw mode is not supported` appears, ensure CI scripts avoid interactive prompts. Consider using `expect` scripts or a non-interactive fallback.
+If terminal input fails (`Raw mode not supported`):
+
+* Avoid interactive scripts in CI
+* Use tools like `expect` for input simulation
 
 ---
 
-## 🚀 Execution Workflow
+## 🚀 Execution Flow
 
-1. Launch Claude Code
-2. Load and read this `SETUP.md`
-3. Generate project directory structure
-4. Create required documents step by step
-5. Configure GitHub Actions via `claude.yml`
-6. Review Claude's output and iterate based on feedback
-
----
-
-## 📂 Expected Output Files
-
-| File Path                      | Description                               |
-| ------------------------------ | ----------------------------------------- |
-| `.claude/CLAUDE.md`            | Behavioral instructions for Claude        |
-| `README.md`                    | Project summary and onboarding            |
-| `TESTING.md`                   | Testing strategy and execution guidelines |
-| `STRUCTURE.md`                 | Explanation of project structure          |
-| `CONTRIBUTING.md`              | Development and contribution rules        |
-| `.github/workflows/claude.yml` | Claude GitHub Action configuration        |
+1. Launch Claude
+2. Load this `SETUP.md`
+3. Read `docs/specification.md`
+4. Scaffold the directory structure
+5. Generate documentation
+6. Configure GitHub workflows
+7. Handle multiple issues in parallel
+8. Test, refine, and finalize deliverables
 
 ---
 
-## ✨ Final Notes
+## 📄 Deliverables
 
-Claude, please execute the setup based on this document. Use your best reasoning, test your assumptions, and adapt your outputs based on feedback.
+| Path                           | Description                            |
+| ------------------------------ | -------------------------------------- |
+| `.claude/CLAUDE.md`            | Core Claude behavior and rules         |
+| `docs/README.md`               | Project overview and introduction      |
+| `docs/TESTING.md`              | Testing policies and structure         |
+| `docs/STRUCTURE.md`            | Architecture and directory explanation |
+| `docs/CONTRIBUTING.md`         | Contribution and dev standards         |
+| `.github/workflows/claude.yml` | GitHub Actions automation              |
+| `docs/specification.md`        | Project specification (reference file) |
 
-Your goal is to generate thoughtful, accurate, and high-quality results—not just to follow orders. Let's build something great together 🐻🚀
+---
+
+## 🧠 Final Note to Claude
+
+Claude, please execute this setup thoroughly. Read specifications, interpret intentions, generate assets with precision, and continuously test your output.
+
+You must work across multiple branches, manage parallel tasks, and merge changes gracefully. Your role is not just as an assistant, but as a capable contributor.
+
+Act smart. Iterate often. Build boldly. Let’s make something exceptional together 🐻🚀

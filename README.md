@@ -242,4 +242,4 @@ SETUP.mdに従って、ファイル整理用のCLIツールを作成してくだ
 
 - 🐛 バグ報告: [GitHub Issues](https://github.com/20m61/Claude-Setup-Document-for-Documentation-Generation/issues)
 - 💬 ディスカッション: [GitHub Discussions](https://github.com/20m61/Claude-Setup-Document-for-Documentation-Generation/discussions)
-- 📧 お問い合わせ: your-email@example.com
+- 📧 お問い合わせ: info@claude-setup.dev

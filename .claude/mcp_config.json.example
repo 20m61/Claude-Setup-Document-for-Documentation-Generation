@@ -1,0 +1,43 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "mcp-server-filesystem",
+      "args": ["--allowed-directories", "./src", "./tests", "./docs"],
+      "description": "ファイルシステム操作用MCPサーバー"
+    },
+    "git": {
+      "command": "mcp-server-git",
+      "args": ["--repo-path", "."],
+      "description": "Git操作用MCPサーバー"
+    },
+    "memory": {
+      "command": "mcp-server-memory",
+      "args": [],
+      "description": "セッション間でのメモリ永続化"
+    },
+    "websearch": {
+      "command": "mcp-server-websearch",
+      "args": ["--max-results", "10"],
+      "description": "Web検索用MCPサーバー"
+    }
+  },
+  "globalOptions": {
+    "timeout": 30000,
+    "retryAttempts": 3,
+    "logLevel": "info"
+  },
+  "security": {
+    "allowedPaths": [
+      "./src/**",
+      "./tests/**",
+      "./docs/**",
+      "./.claude/**"
+    ],
+    "blockedPaths": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/dist/**",
+      "**/build/**"
+    ]
+  }
+}

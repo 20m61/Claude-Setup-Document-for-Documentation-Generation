@@ -88,7 +88,9 @@ my-project/
 │   ├── CLAUDE.md
 │   ├── goals.md
 │   ├── mistakes.md
-│   └── prompts.md
+│   ├── prompts.md
+│   ├── mcp_config.json
+│   └── mcp_config.json.example
 ├── src/
 │   ├── lib/
 │   ├── cli/
@@ -107,6 +109,7 @@ my-project/
 │   └── specification.md
 ├── scripts/
 │   ├── setup.sh
+│   ├── setup-mcp.sh
 │   ├── test.sh
 │   └── format.sh
 ├── .github/
@@ -343,6 +346,132 @@ jobs:
 
 ---
 
+## 🔧 MCP (Model Context Protocol) Setup
+
+### Required MCP Tools
+
+Claude can leverage MCP tools to enhance its capabilities. Install and configure the following:
+
+#### 1. **File System MCP**
+Provides enhanced file operations beyond basic read/write.
+
+```bash
+npm install -g @modelcontextprotocol/server-filesystem
+```
+
+Configuration in `claude_mcp_config.json`:
+```json
+{
+  "fileSystemMCP": {
+    "command": "mcp-server-filesystem",
+    "args": ["--allowed-directories", "/workspaces/", "/tmp/"]
+  }
+}
+```
+
+#### 2. **Git MCP**
+Enhanced Git operations and repository management.
+
+```bash
+npm install -g @modelcontextprotocol/server-git
+```
+
+Configuration:
+```json
+{
+  "gitMCP": {
+    "command": "mcp-server-git",
+    "args": ["--repo-path", "."]
+  }
+}
+```
+
+#### 3. **Database MCP** (if applicable)
+For projects with database interactions.
+
+```bash
+npm install -g @modelcontextprotocol/server-postgres
+# or
+npm install -g @modelcontextprotocol/server-sqlite
+```
+
+#### 4. **Web Search MCP**
+For accessing up-to-date information.
+
+```bash
+npm install -g @modelcontextprotocol/server-websearch
+```
+
+#### 5. **IDE Integration MCP**
+Already available in Claude Code:
+- `mcp__ide__getDiagnostics` - Get language diagnostics from VS Code
+- `mcp__ide__executeCode` - Execute code in Jupyter notebooks
+
+### MCP Configuration File
+
+Create `.claude/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "mcp-server-filesystem",
+      "args": ["--allowed-directories", "./src", "./tests", "./docs"],
+      "description": "File system operations"
+    },
+    "git": {
+      "command": "mcp-server-git",
+      "args": ["--repo-path", "."],
+      "description": "Git operations"
+    },
+    "memory": {
+      "command": "mcp-server-memory",
+      "args": [],
+      "description": "Persistent memory across sessions"
+    }
+  },
+  "globalOptions": {
+    "timeout": 30000,
+    "retryAttempts": 3
+  }
+}
+```
+
+### Usage Guidelines
+
+1. **File Operations**: Use MCP filesystem tools for batch operations
+2. **Git Integration**: Use MCP git tools for complex branch management
+3. **Memory Persistence**: Use memory MCP to maintain context across sessions
+4. **IDE Integration**: Leverage VS Code diagnostics for real-time error detection
+
+### Installation Script
+
+Add to `scripts/setup-mcp.sh`:
+
+```bash
+#!/bin/bash
+
+echo "Installing MCP tools..."
+
+# Core MCP tools
+npm install -g @modelcontextprotocol/server-filesystem
+npm install -g @modelcontextprotocol/server-git
+npm install -g @modelcontextprotocol/server-memory
+
+# Optional tools based on project needs
+if [ -f "package.json" ] && grep -q "postgres" package.json; then
+  npm install -g @modelcontextprotocol/server-postgres
+fi
+
+# Create MCP config directory
+mkdir -p .claude
+cp .claude/mcp_config.json.example .claude/mcp_config.json
+
+echo "MCP tools installed successfully!"
+```
+
+---
+
 ## 🚀 CI/CD Pipeline
 
 ### Pipeline Stages
@@ -459,11 +588,13 @@ If terminal input fails (`Raw mode not supported`):
 1. Launch Claude
 2. Load this `SETUP.md`
 3. Read `docs/specification.md`
-4. Scaffold the directory structure
-5. Generate documentation
-6. Configure GitHub workflows
-7. Handle multiple issues in parallel
-8. Test, refine, and finalize deliverables
+4. Install MCP tools via `scripts/setup-mcp.sh`
+5. Configure MCP settings in `.claude/mcp_config.json`
+6. Scaffold the directory structure
+7. Generate documentation
+8. Configure GitHub workflows
+9. Handle multiple issues in parallel
+10. Test, refine, and finalize deliverables
 
 ---
 
@@ -478,6 +609,8 @@ If terminal input fails (`Raw mode not supported`):
 | `docs/CONTRIBUTING.md`         | Contribution and dev standards         |
 | `.github/workflows/claude.yml` | GitHub Actions automation              |
 | `docs/specification.md`        | Project specification (reference file) |
+| `.claude/mcp_config.json`      | MCP tools configuration                |
+| `scripts/setup-mcp.sh`         | MCP installation script                |
 
 ---
 

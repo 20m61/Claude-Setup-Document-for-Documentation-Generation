@@ -23,6 +23,59 @@ This document includes:
 * Page/module hierarchy
 * Test expectations
 
+### 📝 Specification Template Example
+
+```markdown
+# Project Specification
+
+## 🎯 Project Goals
+- Primary objective: [Brief description]
+- Secondary objectives: [List]
+
+## 📋 Functional Requirements
+### Core Features
+1. Feature A: [Description]
+2. Feature B: [Description]
+
+### User Stories
+- As a [role], I want to [action] so that [benefit]
+
+## 👥 User Roles
+- Admin: [Permissions and responsibilities]
+- User: [Permissions and responsibilities]
+
+## 🛠️ Technology Stack
+- Frontend: React 18.x, TypeScript 5.x
+- Backend: Node.js 20.x, Express 4.x
+- Database: PostgreSQL 15.x
+- Testing: Jest, React Testing Library
+
+## 📊 Success Metrics
+- Performance: [Specific metrics]
+- User engagement: [Specific metrics]
+```
+
+---
+
+## 📦 Version Requirements
+
+### Minimum Versions
+```json
+{
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
+```
+
+### Recommended Versions
+- Node.js: 20.11.0 (LTS)
+- npm: 10.2.4
+- TypeScript: 5.3.x
+- React: 18.2.x (if applicable)
+- Python: 3.11.x (if applicable)
+
 ---
 
 ## 🗂️ Recommended Directory Structure
@@ -64,8 +117,184 @@ my-project/
 ├── tsconfig.json
 ├── .eslintrc.json
 ├── .prettierrc
+├── .env.example
+├── .env.local
 └── CLAUDE.md
 ```
+
+---
+
+## 🌍 Environment Variables Management
+
+### Setup
+
+1. Create `.env.example` with all required variables (without values):
+```bash
+# API Keys
+ANTHROPIC_API_KEY=
+DATABASE_URL=
+
+# Application Config
+NODE_ENV=
+PORT=
+LOG_LEVEL=
+```
+
+2. Copy to `.env.local` for local development:
+```bash
+cp .env.example .env.local
+```
+
+3. Add `.env.local` to `.gitignore`
+
+### Environment-Specific Configs
+
+```
+config/
+├── default.json     # Shared settings
+├── development.json # Dev overrides
+├── staging.json     # Staging overrides
+└── production.json  # Prod overrides
+```
+
+---
+
+## 📚 Dependency Management
+
+### Security Practices
+
+1. **Lock Files**: Always commit `package-lock.json` or `yarn.lock`
+
+2. **Security Audits**: Run regularly
+```bash
+npm audit
+npm audit fix --audit-level=moderate
+```
+
+3. **Update Strategy**:
+```bash
+# Check outdated packages
+npm outdated
+
+# Update minor/patch versions
+npm update
+
+# Update major versions carefully
+npm install package@latest
+```
+
+4. **Dependency Review**: Add to `package.json`:
+```json
+{
+  "scripts": {
+    "audit": "npm audit --audit-level=moderate",
+    "check-updates": "npx npm-check-updates"
+  }
+}
+```
+
+---
+
+## 🧪 Test Strategy
+
+### Test Structure
+```
+tests/
+├── unit/           # Fast, isolated tests
+├── integration/    # Component interaction tests
+├── e2e/           # End-to-end user flows
+└── fixtures/      # Test data and mocks
+```
+
+### Coverage Goals
+- Unit Tests: 80% coverage minimum
+- Integration Tests: Critical paths covered
+- E2E Tests: Main user journeys
+
+### Test Scripts
+```json
+{
+  "scripts": {
+    "test": "jest",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
+    "test:e2e": "playwright test",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
+  }
+}
+```
+
+### Test Principles
+1. **AAA Pattern**: Arrange, Act, Assert
+2. **Single Responsibility**: One test, one behavior
+3. **Descriptive Names**: `should_[expectedBehavior]_when_[condition]`
+4. **No Test Interdependence**: Tests run in any order
+
+---
+
+## 🚨 Error Handling Guidelines
+
+### Error Categories
+
+1. **Operational Errors**: Expected failures
+   - Network timeouts
+   - Invalid user input
+   - Database conflicts
+
+2. **Programming Errors**: Bugs
+   - Type errors
+   - Null references
+   - Logic errors
+
+### Error Handling Patterns
+
+```typescript
+// Custom error classes
+class ApplicationError extends Error {
+  constructor(
+    public message: string,
+    public code: string,
+    public statusCode: number,
+    public isOperational: boolean = true
+  ) {
+    super(message);
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+// Global error handler
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  if (error instanceof ApplicationError && error.isOperational) {
+    // Log and return user-friendly error
+    logger.error(error);
+    return res.status(error.statusCode).json({
+      error: {
+        code: error.code,
+        message: error.message
+      }
+    });
+  }
+  
+  // Programming errors - log and return generic message
+  logger.fatal(error);
+  return res.status(500).json({
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: 'An unexpected error occurred'
+    }
+  });
+});
+```
+
+### Claude Error Recovery
+
+When Claude encounters errors:
+
+1. **Log the error context**
+2. **Attempt recovery** if possible
+3. **Report to user** with actionable steps
+4. **Update `mistakes.md`** with learnings
 
 ---
 
@@ -111,6 +340,59 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+---
+
+## 🚀 CI/CD Pipeline
+
+### Pipeline Stages
+
+1. **Build Stage**
+```yaml
+build:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build
+```
+
+2. **Test Stage**
+```yaml
+test:
+  needs: build
+  strategy:
+    matrix:
+      test-type: [unit, integration, e2e]
+  steps:
+    - run: npm run test:${{ matrix.test-type }}
+    - uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test-results-${{ matrix.test-type }}
+        path: test-results/
+```
+
+3. **Deploy Stage**
+```yaml
+deploy:
+  needs: [build, test]
+  if: github.ref == 'refs/heads/main'
+  steps:
+    - run: npm run deploy:${{ github.event_name == 'release' && 'prod' || 'staging' }}
+```
+
+### Quality Gates
+
+- ✅ All tests pass
+- ✅ Code coverage > 80%
+- ✅ No security vulnerabilities
+- ✅ Linting passes
+- ✅ Type checking passes
 
 ---
 
